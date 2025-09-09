@@ -1,4 +1,5 @@
 from custom_requester.custom_requester import CustomRequester
+from constants import AUTH_BASE_URL
 
 
 class UserAPI(CustomRequester):
@@ -7,7 +8,7 @@ class UserAPI(CustomRequester):
     """
 
     def __init__(self, session):
-        super().__init__(session, base_url=self._base_url)
+        super().__init__(session, base_url=AUTH_BASE_URL)
         self._session = session
 
     def get_user_info(self, user_id, expected_status=200):
