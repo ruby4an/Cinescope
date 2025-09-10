@@ -1,14 +1,8 @@
 from utils.data_generator import DataGenerator
+import pytest
 
 
 class TestMoviesApi:
-	def test_max_lt_min(self, super_admin):
-		query = {
-			"minPrice": 2000,
-			"maxPrice": 1000
-		}
-
-		super_admin.api.movies_api.get_movies(query, 400)
 
 	def test_create_empty_movie(self, super_admin):
 		body = {}
@@ -46,3 +40,46 @@ class TestMoviesApi:
 		)
 		assert response.json()["name"] == body["name"] and \
 			response.json()["price"] == body["price"], "Данные не обновлены"
+
+	@pytest.mark.parametrize(
+		"minprice,maxprice,locations,genre_id,expected_status",
+		[
+			(200, 800, "SPB", 3, 200),
+			(500, 1500, ("SPB", "MKS"), 4, 200),
+			(1500, 100, "SPB", 1, 400)
+		],
+		ids=["Regular query", "Two cities in query", "Bad request (min>max)"]
+	)
+	def test_param_get_films(self, super_admin, minprice, maxprice, locations, genre_id, expected_status):
+		"""
+		Параметризированный тест разных query на movies
+		"""
+		params = {
+			"minPrice": minprice,
+			"maxPrice": maxprice,
+			"locations": locations,
+			"genreId": genre_id
+		}
+		super_admin.api.movies_api.get_movies(params, expected_status=expected_status)
+
+	@pytest.mark.parametrize(
+		"user_type,expected_status",
+		[
+			("super_admin", 200),
+			("admin", 403),
+			("user", 403)
+		],
+		ids=["Delete by super admin", "Delete by admin (forbidden)", "Delete by user (forbidden)"]
+	)
+	def test_param_delete_film(self, super_admin, admin, common_user, user_type, expected_status: int):
+		# получаю рандомный фильм
+		film = super_admin.api.movies_api.get_movies().json()["movies"][0]
+		film_id = film["id"]
+
+		users = {
+			"super_admin": super_admin,
+			"admin": admin,
+			"user": common_user
+		}
+
+		users[user_type].api.movies_api.delete_movie(film_id, expected_status=expected_status)
