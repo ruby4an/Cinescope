@@ -1,8 +1,8 @@
 from faker import Faker
 import pytest
 import requests
-from constants.constants import AUTH_BASE_URL, REGISTER_ENDPOINT, LOGIN_ENDPOINT, ADMIN_CRED
-from resourses.user_creds import USERNAME, PASSWORD
+from constants.constants import AUTH_BASE_URL, REGISTER_ENDPOINT
+from resourses.user_creds import SuperAdminCreds
 from custom_requester.custom_requester import CustomRequester
 from utils.data_generator import DataGenerator
 from api.api_manager import ApiManager
@@ -97,8 +97,8 @@ def super_admin(user_session):
     new_session = user_session()
 
     super_admin = User(
-        email=USERNAME,
-        password=PASSWORD,
+        email=SuperAdminCreds.USERNAME,
+        password=SuperAdminCreds.PASSWORD,
         roles=Roles.SUPER_ADMIN.value,
         api=new_session
     )

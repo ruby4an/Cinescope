@@ -42,7 +42,7 @@ class TestMoviesApi:
 			response.json()["price"] == body["price"], "Данные не обновлены"
 
 	@pytest.mark.parametrize(
-		"minprice,maxprice,locations,genre_id,expexted_status",
+		"minprice,maxprice,locations,genre_id,expected_status",
 		[
 			(200, 800, "SPB", 3, 200),
 			(500, 1500, ("SPB", "MKS"), 4, 200),
@@ -50,7 +50,7 @@ class TestMoviesApi:
 		],
 		ids=["Regular query", "Two cities in query", "Bad request (min>max)"]
 	)
-	def test_param_get_films(self, super_admin, minprice, maxprice, locations, genre_id, expexted_status):
+	def test_param_get_films(self, super_admin, minprice, maxprice, locations, genre_id, expected_status):
 		"""
 		Параметризированный тест разных query на movies
 		"""
@@ -60,4 +60,26 @@ class TestMoviesApi:
 			"locations": locations,
 			"genreId": genre_id
 		}
-		super_admin.api.movies_api.get_movies(params, expected_status=expexted_status)
+		super_admin.api.movies_api.get_movies(params, expected_status=expected_status)
+
+	@pytest.mark.parametrize(
+		"user_type,expected_status",
+		[
+			("super_admin", 200),
+			("admin", 403),
+			("user", 403)
+		],
+		ids=["Delete by super admin", "Delete by admin (forbidden)", "Delete by user (forbidden)"]
+	)
+	def test_param_delete_film(self, super_admin, admin, common_user, user_type, expected_status: int):
+		# получаю рандомный фильм
+		film = super_admin.api.movies_api.get_movies().json()["movies"][0]
+		film_id = film["id"]
+
+		users = {
+			"super_admin": super_admin,
+			"admin": admin,
+			"user": common_user
+		}
+
+		users[user_type].api.movies_api.delete_movie(film_id, expected_status=expected_status)
