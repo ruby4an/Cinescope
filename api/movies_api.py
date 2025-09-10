@@ -14,7 +14,8 @@ class MoviesAPI(CustomRequester):
             "GET",
             MOVIES_ENDPOINT,
             params=params,
-            expected_status=expected_status
+            expected_status=expected_status,
+            need_logging=False
         )
 
     def get_movie(self, movie_id, expected_status=200):
