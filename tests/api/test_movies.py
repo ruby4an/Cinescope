@@ -1,49 +1,38 @@
-import requests
-from constants import HEADERS, MOVIES_ENDPOINT
 from utils.data_generator import DataGenerator
-
-"""
-	эТи тесты были написаны без враппера - для них нужен отдельный
-"""
 
 
 class TestMoviesApi:
-	def test_max_lt_min(self):
+	def test_max_lt_min(self, super_admin):
 		query = {
 			"minPrice": 2000,
 			"maxPrice": 1000
 		}
 
-		response = requests.get(MOVIES_ENDPOINT, headers=HEADERS, params=query)
+		super_admin.api.movies_api.get_movies(query, 400)
 
-		assert response.status_code == 400, "Не пришел 400 код"
-
-	def test_create_empty_movie(self, admin_auth_session):
+	def test_create_empty_movie(self, super_admin):
 		body = {}
 
-		response = admin_auth_session.post(MOVIES_ENDPOINT, headers=HEADERS, json=body)
+		super_admin.api.movies_api.create_movie(body, 400)
 
-		assert response.status_code == 400
-
-	def test_get_film(self):
+	def test_get_film(self, super_admin):
 		# получаю рандомный фильм
-		film = requests.get(MOVIES_ENDPOINT).json()["movies"][0]
+		film = super_admin.api.movies_api.get_movies().json()["movies"][0]
 		film_id = film["id"]
-		# получаю его же по айдишнику
-		response = requests.get(f"{MOVIES_ENDPOINT}/{film_id}")
 
-		assert response.status_code == 200, "Ошибка получения фильма"
+		# получаю его же по айдишнику
+		response = super_admin.api.movies_api.get_movie(film_id)
+
 		assert response.json()["name"] == film["name"], "Имена не совпадают"
 
-	def test_get_invalid_film(self):
-		invalid_id = 22848133708
+	def test_get_invalid_film(self, super_admin):
+		invalid_id = "228481337"
 
-		response = requests.get(f"{MOVIES_ENDPOINT}/{invalid_id}")
-		assert response.status_code == 404, "Найден фильм с несуществующим айди"
+		super_admin.api.movies_api.get_movie(invalid_id, 404)
 
-	def test_film_patch(self, admin_auth_session):
+	def test_film_patch(self, super_admin):
 		# получаю рандомный фильм
-		film = requests.get(MOVIES_ENDPOINT).json()["movies"][0]
+		film = super_admin.api.movies_api.get_movies().json()["movies"][0]
 		film_id = film["id"]
 
 		body = {
@@ -51,8 +40,9 @@ class TestMoviesApi:
 			"price": 1488
 		}
 
-		response = admin_auth_session.patch(f"{MOVIES_ENDPOINT}/{film_id}", json=body)
-
-		assert response.status_code == 200, "Данные не обновлены"
+		response = super_admin.api.movies_api.edit_movie(
+			film_id,
+			body
+		)
 		assert response.json()["name"] == body["name"] and \
 			response.json()["price"] == body["price"], "Данные не обновлены"

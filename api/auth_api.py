@@ -1,4 +1,5 @@
-from constants import REGISTER_ENDPOINT, AUTH_BASE_URL, LOGIN_ENDPOINT
+from requests import Session
+from constants.constants import REGISTER_ENDPOINT, AUTH_BASE_URL, LOGIN_ENDPOINT
 from custom_requester.custom_requester import CustomRequester
 
 
@@ -7,7 +8,7 @@ class AuthAPI(CustomRequester):
 		Класс для работы с ауе
 	"""
 
-	def __init__(self, session):
+	def __init__(self, session: Session):
 		super().__init__(session=session, base_url=AUTH_BASE_URL)
 
 	def register_user(self, user_data, expected_status=201):
@@ -43,4 +44,4 @@ class AuthAPI(CustomRequester):
 			raise KeyError("token is missing")
 
 		token = response["accessToken"]
-		self.update_session_headers(**{"authorization": "Bearer " + token})
+		self.update_session_headers(**{"Authorization": "Bearer " + token})
