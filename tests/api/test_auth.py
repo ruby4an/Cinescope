@@ -1,4 +1,4 @@
-from api_manager import ApiManager
+from api.api_manager import ApiManager
 
 
 class TestAuthApi:
@@ -6,10 +6,11 @@ class TestAuthApi:
 		"""
 		Тест на регистрацию пользователя.
 		"""
-		response = api_manager.auth_api.register_user(test_user)
+		data = test_user()
+		response = api_manager.auth_api.register_user(data)
 		response_data = response.json()
 
-		assert response_data["email"] == test_user["email"], "Email не совпадает"
+		assert response_data["email"] == data["email"], "Email не совпадает"
 		assert "id" in response_data, "ID пользователя отсутствует в ответе"
 		assert "roles" in response_data, "Роли пользователя отсутствуют в ответе"
 		assert "USER" in response_data["roles"], "Роль USER должна быть у пользователя"
@@ -52,7 +53,7 @@ class TestAuthApi:
 
 		assert response.json()["message"] != '' and response.json()["message"] is not None, "Нет сообщения об ошибке"
 
-	def test_auth_empty(self, api_manager: ApiManager, test_user):
+	def test_auth_empty(self, api_manager: ApiManager):
 		"""
 		вход с пустым телом запроса
 		"""

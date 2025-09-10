@@ -29,9 +29,14 @@ class CustomRequester:
 	def headers(self):
 		return self._headers
 
-	def send_request(self, method, endpoint, data=None, expected_status=200, need_logging=True):
+	@property
+	def session(self):
+		return self._session
+
+	def send_request(self, method, endpoint, params: dict = None, data=None, expected_status=200, need_logging=True):
 		"""
 		Универсальный метод для отправки запросов.
+		:param params: параметры запроса (query)
 		:param method: HTTP метод (GET, POST, PUT, DELETE и т.д.).
 		:param endpoint: Эндпоинт (например, "/login").
 		:param data: Тело запроса (JSON-данные).
@@ -40,7 +45,7 @@ class CustomRequester:
 		:return: Объект ответа requests.Response.
 		"""
 		url = f"{self._base_url}{endpoint}"
-		response = self._session.request(method, url, json=data)
+		response = self._session.request(method, url, json=data, params=params)
 
 		if need_logging:
 			self.log_request_and_response(response)
