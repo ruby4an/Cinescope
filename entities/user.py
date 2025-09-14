@@ -1,8 +1,9 @@
 from api.api_manager import ApiManager
+from pydantic import EmailStr
 
 
 class User:
-    def __init__(self, email: str, password: str, roles: list, api: ApiManager):
+    def __init__(self, email: str | EmailStr, password: str, roles: list, api: ApiManager):
         self._email = email
         self._password = password
         self._roles = roles
