@@ -1,7 +1,11 @@
+from typing import Generator
 from faker import Faker
 import pytest
 import requests
+from sqlalchemy.orm import Session
 from constants.constants import AUTH_BASE_URL, REGISTER_ENDPOINT
+from db_requester.db_client import get_db_session
+from db_requester.db_helpers import DBHelper
 from models.base_models import TestUser
 from resourses.user_creds import SuperAdminCreds
 from custom_requester.custom_requester import CustomRequester
@@ -156,3 +160,50 @@ def creation_user_data(test_user):
         updated_data.banned=False
         return updated_data
     return _internal
+
+@pytest.fixture(scope="module")
+def db_session()-> Generator[Session, None, None]:
+    db_session = get_db_session()
+    try:
+        yield db_session
+    finally:
+        db_session.close()
+
+@pytest.fixture(scope="function")
+def db_helper(db_session) -> DBHelper:
+    db_helper = DBHelper(db_session)
+    return db_helper
+
+@pytest.fixture(scope="function")
+def created_test_user(db_helper):
+    user = db_helper.create_test_user(DataGenerator.generate_user_data())
+    try:
+        yield user
+    # Cleanup
+    finally:
+        if db_helper.get_user_by_id(user.id):
+            db_helper.delete_user(user)
+
+@pytest.fixture(scope="function")
+def created_test_movie(db_helper):
+    movie = db_helper.create_test_movie(DataGenerator.generate_movie_data())
+    try:
+        yield movie
+    # Cleanup
+    finally:
+        if db_helper.get_movie_by_id(movie.id):
+            db_helper.cleanup_test_data([movie])
+            assert db_helper.get_movie_by_id(movie.id) is None, f"Фильм с ID '{movie.id}' не был удален из базы"
+
+@pytest.fixture(scope="function")
+def created_ebnutiy_movie(db_helper):
+    ebnutaya_data = DataGenerator.generate_movie_data()
+    ebnutaya_data['name'] = "Ебнутая комедия игорь подзалупный"
+    movie = db_helper.create_test_movie(ebnutaya_data)
+    try:
+        yield movie
+    # Cleanup
+    finally:
+        if db_helper.get_movie_by_id(movie.id):
+            db_helper.cleanup_test_data([movie])
+            assert db_helper.get_movie_by_id(movie.id) is None, f"Фильм с ID '{movie.id}' не был удален из базы"
