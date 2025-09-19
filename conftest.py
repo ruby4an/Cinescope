@@ -2,6 +2,7 @@ from typing import Generator
 from faker import Faker
 import pytest
 import requests
+import time
 from sqlalchemy.orm import Session
 from constants.constants import AUTH_BASE_URL, REGISTER_ENDPOINT
 from db_requester.db_client import get_db_session
@@ -207,3 +208,8 @@ def created_ebnutiy_movie(db_helper):
         if db_helper.get_movie_by_id(movie.id):
             db_helper.cleanup_test_data([movie])
             assert db_helper.get_movie_by_id(movie.id) is None, f"Фильм с ID '{movie.id}' не был удален из базы"
+
+@pytest.fixture
+def delay_between_retries():
+    time.sleep(2)
+    yield

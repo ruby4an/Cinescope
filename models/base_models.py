@@ -34,7 +34,7 @@ class Config:
 
 class RegisterUserResponse(BaseModel):
     id: str
-    email: EmailStr
+    email: EmailStr | str
     fullName: NonEmptyString
     verified: bool
     banned: bool
