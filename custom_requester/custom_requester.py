@@ -91,7 +91,7 @@ class CustomRequester:
 
 			self.logger.info(
 				f"{GREEN}{full_test_name}{RESET}\n"
-				f"curl -X {request.method} '{request.url}' \\\n"
+				f"curl -X {request.method} '{request._url}' \\\n"
 				f"{headers} \\\n"
 				f"{body}"
 			)
