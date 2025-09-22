@@ -2,7 +2,7 @@ from models.base_models import RegisterUserResponse
 
 class TestUser:
 	def test_create_user(self, super_admin, creation_user_data):
-		data = creation_user_data()
+		data = creation_user_data().model_dump(exclude_none=True)
 
 		response = super_admin.api.user_api.create_user(data).json()
 

@@ -1,3 +1,5 @@
+import pytest
+
 from api.api_manager import ApiManager
 from models.base_models import RegisterUserResponse, TestUser
 from constants.roles import Roles
@@ -67,6 +69,7 @@ class TestAuthApi:
 	@allure.title("Тест регистрации пользователя с использованием моков")
 	@allure.severity(allure.severity_level.MINOR)
 	@allure.label("owner", "ruby4an")
+	@pytest.mark.xfail(reason="Тест написан с целью демонстрации моков и должен падать")
 	def test_register_user_mock(self, api_manager: ApiManager, test_user: TestUser, mocker):
 
 		with allure.step("Создание фиктивного ответа для метода register_user"):

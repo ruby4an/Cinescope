@@ -107,7 +107,7 @@ def super_admin(user_session):
     super_admin = User(
         email=SuperAdminCreds.USERNAME,
         password=SuperAdminCreds.PASSWORD,
-        roles=[Roles.SUPER_ADMIN.value],
+        roles=[Roles.SUPER_ADMIN],
         api=new_session
     )
 
@@ -123,7 +123,7 @@ def admin(user_session, super_admin, creation_user_data):
     admin = User(
         data.email,
         data.password,
-        [Roles.ADMIN.value],
+        [Roles.ADMIN],
         new_session
     )
 
@@ -146,7 +146,7 @@ def common_user(user_session, super_admin, creation_user_data):
     common_user = User(
         data.email,
         data.password,
-        [Roles.USER.value],
+        [Roles.USER],
         new_session
     )
 
@@ -161,6 +161,7 @@ def creation_user_data(test_user):
         updated_data = test_user()
         updated_data.verified=True
         updated_data.banned=False
+        updated_data.passwordRepeat=None
         return updated_data
     return _internal
 
