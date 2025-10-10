@@ -6,3 +6,4 @@ __pycache__/
 .idea/
 .token
 .env
+tests/api/test_mock_services.py
