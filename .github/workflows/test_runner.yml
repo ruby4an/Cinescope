@@ -98,7 +98,7 @@ jobs:
         # Путь к файлам результатов
         path: allure-results/
         # Сколько дней хранить артефакт (максимум 90)
-        retention-days: 5
+        retention-days: 2
 
     # Шаг 9: Генерация Allure-отчета
     - name: Generate Allure report
@@ -110,3 +110,23 @@ jobs:
         # Выводим в лог инструкцию для локального использования:
         echo allure serve allure-results
         echo C:\Users\ruby4\scoop\apps\allure\current\bin\allure.bat serve ./allure-results
+
+    # Шаг 10: Нагрузочное тестирование
+    - name: Run locust load tests
+      run: |
+        # Запуск locust в headless режиме на 4 воркерах с генерацией HTML и CSV отчетов
+        locust --config locust.conf --html locust-report.html --csv locust-results
+
+    # Шаг 11: Сохранение locust отчета как артефакта
+    - name: Upload Locust Report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        # Имя артефакта
+        name: locust-load-test-report
+        # Путь к файлам результатов
+        path: |
+          locust-report.html
+          locust-results_*.csv
+        # Сколько дней хранить артефакт
+        retention-days: 2
