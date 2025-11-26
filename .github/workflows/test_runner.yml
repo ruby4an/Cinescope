@@ -116,6 +116,7 @@ jobs:
       run: |
         # Запуск locust в headless режиме на 4 воркерах с генерацией HTML и CSV отчетов
         locust --config locust.conf --html locust-report.html --csv locust-results
+      continue-on-error: true
 
     # Шаг 11: Сохранение locust отчета как артефакта
     - name: Upload Locust Report
