@@ -174,6 +174,9 @@ def db_session()-> Generator[Session, None, None]:
     db_session = get_db_session()
     try:
         yield db_session
+    except Exception:
+        db_session.rollback()
+        raise
     finally:
         db_session.close()
 
