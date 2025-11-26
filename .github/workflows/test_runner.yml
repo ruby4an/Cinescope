@@ -85,8 +85,8 @@ jobs:
     # Шаг 7: Запуск тестов
     - name: Run tests
       run: |
-        # Запуск конкретного теста с генерацией Allure-отчета
-        python -m pytest tests/ui/test_UI.py::TestLoginPage::test_login_with_ui -v --alluredir=allure-results
+        # Запуск тестов параллельно в 4 воркерах с генерацией Allure-отчета
+        python -m pytest -n 4 -v --alluredir=allure-results
       
     # Шаг 8: Сохранение результатов тестов как артефакта
     - name: Upload Allure results
