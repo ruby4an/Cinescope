@@ -14,13 +14,25 @@ class QuickstartUser(HttpUser):
     wait_time = between(1, 2)
 
     def on_start(self):
-        with self.client.post(url="/login", data = {
-            "email": SuperAdminCreds.USERNAME,
-            "fullName": SuperAdminCreds.PASSWORD
-        }) as response:
+        """
+        Новый юзер логинится под кредами супер-админа и записывает токен в атрибут self.token
+        """
+        response = self.client.post(
+            "/login",
+            json={
+                "email": SuperAdminCreds.USERNAME,
+                "password": SuperAdminCreds.PASSWORD
+            }
+        )
+        if response.status_code == 200:
             self.token = response.json()["accessToken"]
+        else:
+            print(f"Login failed: {response.status_code}, {response.text}")
 
     @task
     def user_list(self):
-        self.client.get("/user", headers={"Authorization": f"Bearer {self.token}"})
+        """
+        Получаем список юзеров с кредами супер-админа
+        """
+        self.client.get("/user", headers={"Authorization": "Bearer " + self.token})
 
