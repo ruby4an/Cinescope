@@ -41,6 +41,9 @@ jobs:
         pip install -r requirements.txt
         # Устанавливаем дополнительные пакеты для тестирования
         pip install pytest pytest-check allure-pytest
+        # Устанавливаем PlayWright браузеры
+        playwright install
+        pip install pytest-playwright
 
     # Шаг 4: Установка Allure Commandline
     - name: Install Allure Commandline
