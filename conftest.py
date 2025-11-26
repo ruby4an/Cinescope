@@ -25,7 +25,7 @@ def test_user():
     """
     Генерация случайного пользователя для тестов.
     """
-    def _internal():
+    def _internal() -> TestUser:
         random_email = DataGenerator.generate_random_email()
         random_name = DataGenerator.generate_random_name()
         random_password = DataGenerator.generate_random_password()
@@ -41,8 +41,8 @@ def test_user():
     return _internal
 
 
-@pytest.fixture(scope="session")
-def registered_user(requester, test_user):
+@pytest.fixture(scope="function")
+def registered_user(requester, test_user, db_helper):
     """
     Фикстура для регистрации и получения данных зарегистрированного пользователя.
     """
@@ -54,8 +54,12 @@ def registered_user(requester, test_user):
         expected_status=201
     ).json()
     registered_user = data
-    registered_user.id = response_data["id"]
-    return registered_user
+    user_id = registered_user.id = response_data["id"]
+    yield registered_user
+    # teardown
+    if db_helper.get_user_by_id(user_id):
+        db_helper.delete_user_by_id(user_id)
+    assert db_helper.get_user_by_id(user_id) is None, "Не удалился"
 
 
 @pytest.fixture(scope="session")
@@ -221,7 +225,7 @@ def delay_between_retries():
 
 @pytest.fixture(scope="session")
 def browser(playwright):
-    browser = playwright.chromium.launch(headless=False)
+    browser = playwright.chromium.launch(headless=True)
     yield browser
     browser.close()
 

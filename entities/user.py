@@ -10,13 +10,13 @@ class User:
         self._api = api
 
     @property
-    def creds(self):
+    def creds(self) -> tuple:
         return self._email, self._password
 
     @property
-    def api(self):
+    def api(self) -> ApiManager:
         return self._api
 
     @property
-    def email(self):
+    def email(self) -> str:
         return self._email
